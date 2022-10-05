@@ -5,8 +5,12 @@ using UnityEditor;
 
 public class PlayerController : MonoBehaviour
 {
-    public bool[] moveType = new bool[3];
-    bool moveTypeToggle = true;
+    [Header ("Move Type")]
+
+    public bool translateMove = false; 
+    public bool velocityMove = false; 
+    public bool forceMove = false;
+    int previousActive = 0;
 
     float speed = 5f;
     SpriteRenderer sr;
@@ -16,6 +20,7 @@ public class PlayerController : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         rb2d = GetComponent<Rigidbody2D>();
+        rb2d.gravityScale = 0;
     }
 
     void Update()
@@ -23,15 +28,20 @@ public class PlayerController : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float y = Input.GetAxis("Vertical");
 
-        if(false)
+        if(translateMove)
         {
             Vector3 movement = new Vector3(x,y,0).normalized * speed * Time.deltaTime;
             transform.Translate(movement);
         }
-        else if(true)
+        else if(velocityMove)
         {
             Vector2 movement = new Vector2(x,y) * speed;
             rb2d.velocity = movement;
+        }
+        else if(forceMove)
+        {
+            Vector2 movement = new Vector2(x, y);
+            rb2d.AddForce(movement);
         }
 
         Vector2 mousePos = Input.mousePosition;
@@ -41,5 +51,29 @@ public class PlayerController : MonoBehaviour
             sr.flipX = true;
         else if(transform.position.x < mousePos.x)
             sr.flipX = false;
+
+        ToggleGroup();
+    }
+
+    void ToggleGroup()
+    {
+        if(translateMove && previousActive != 0)
+        {
+            velocityMove = false;
+            forceMove = false;
+            previousActive = 0;
+        }
+        else if(velocityMove && previousActive != 1)
+        {
+            translateMove = false;
+            forceMove = false;
+            previousActive = 1;
+        }
+        else if(forceMove && previousActive != 2)
+        {
+            translateMove = false;
+            velocityMove = false;
+            previousActive = 2;
+        }
     }
 }
