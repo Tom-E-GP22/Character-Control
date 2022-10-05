@@ -15,7 +15,7 @@ public class destroy : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D hit)
     {
-        if(hit.gameObject.tag == "Destroyable")
+        if(hit.gameObject.CompareTag("Destroyable"))
         {
             Instantiate(boxExplosion,transform.position, Quaternion.identity);
             Destroy(hit.gameObject);
